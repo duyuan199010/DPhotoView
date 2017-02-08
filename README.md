@@ -3,9 +3,13 @@
 ### A ImageView can dismiss while slide up or slide down.
 
 ###Screenshots
-<img src="screenshots/1.gif" width="320" />
+<img src="screenshots/screenshot1.gif" width="320" />
 
 ###Usage
+
+```
+compile 'com.duyuan:DPhotoView:1.0.3'
+```
 
 ```
 final ArrayList<String> photos = new ArrayList<>();

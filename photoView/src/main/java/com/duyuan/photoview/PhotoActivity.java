@@ -1,23 +1,18 @@
 package com.duyuan.photoview;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,6 +69,7 @@ public class PhotoActivity extends AppCompatActivity {
 
     private void initView() {
         mViewPager = (ViewPager) findViewById(R.id.vp_photo);
+        mViewPager.setOffscreenPageLimit(1);
         mPageTv = (TextView) findViewById(R.id.tv_page);
         mSaveTv = (TextView) findViewById(R.id.tv_save);
         mSaveTv.setOnClickListener(new View.OnClickListener() {
@@ -86,7 +82,6 @@ public class PhotoActivity extends AppCompatActivity {
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override public void onPageScrolled(int position, float positionOffset,
                     int positionOffsetPixels) {
-
                 mPageTv.setText(String.valueOf(position + 1) + "/" + mPhotos.size());
             }
 
@@ -105,7 +100,7 @@ public class PhotoActivity extends AppCompatActivity {
         mPhotoViews = new ArrayList<>(mPhotos.size());
 
         for (String photo : mPhotos) {
-            DPhotoView photoView = (DPhotoView) View.inflate(this, R.layout.view_photo, null);
+            final DPhotoView photoView = (DPhotoView) View.inflate(this, R.layout.view_photo, null);
             Picasso.with(this)
                     .load(photo)
                     .error(R.mipmap.ic_launcher)
@@ -175,7 +170,6 @@ public class PhotoActivity extends AppCompatActivity {
 
     /**
      * Save photo
-     * @param photoUrl
      */
     private void savePhoto(String photoUrl) {
         OutputStream outputStream = null;
@@ -214,12 +208,12 @@ public class PhotoActivity extends AppCompatActivity {
 
     /**
      * check permission
-     * @return
      */
-    public boolean checkPermission() {
+    private boolean checkPermission() {
         if (ContextCompat.checkSelfPermission(this, PERMISSIONS[0])
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_CODE);
+            return false;
         }
         return true;
     }

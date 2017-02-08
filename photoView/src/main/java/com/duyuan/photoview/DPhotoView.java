@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import uk.co.senab.photoview.PhotoView;
 
@@ -25,6 +26,7 @@ public class DPhotoView extends PhotoView {
     private boolean mIsVpEvent = true;//whether is ViewPager event,if it is, can not slide on Y axis
 
     private IPhotoViewListener mPhotoViewListener;
+    private boolean mIsDismiss;//当Activity退出的时候,防止View再次绘制,从而导致最后图片会在屏幕中间闪现
 
     public DPhotoView(Context context) {
         this(context, null);
@@ -37,12 +39,15 @@ public class DPhotoView extends PhotoView {
     }
 
     @Override protected void onDraw(Canvas canvas) {
-        mPaint.setAlpha(mAlpha);
-        canvas.drawRect(0, 0, 3000, 4000, mPaint);
-        if (!mIsVpEvent) {
-            canvas.translate(0, mMoveY);
+        if (!mIsDismiss) {
+            mPaint.setAlpha(mAlpha);
+            canvas.drawRect(0, 0, 3000, 4000, mPaint);
+            if (!mIsVpEvent) {
+                canvas.translate(0, mMoveY);
+            }
+
+            super.onDraw(canvas);
         }
-        super.onDraw(canvas);
     }
 
     @Override public boolean dispatchTouchEvent(MotionEvent event) {
@@ -63,7 +68,13 @@ public class DPhotoView extends PhotoView {
                 if (!mIsVpEvent && mOldY != 0 && Math.abs(mY - mOldY) > 3) {
                     mMoveY = mY - mDownY;
                     //calculate transparency
-                    mAlpha = (int) (255 * (1 - (Math.abs(mMoveY) / (getHeight() - mDownY))));
+                    if (mY > mDownY) {
+                        //下半屏
+                        mAlpha = (int) (255 * (1 - (Math.abs(mMoveY) / (getHeight() - mDownY))));
+                    } else {
+                        //上半屏
+                        mAlpha = (int) (255 * (1 - (Math.abs(mMoveY) / mDownY)));
+                    }
                     invalidate();
                     mIsMoved = true;
                 }
@@ -72,15 +83,16 @@ public class DPhotoView extends PhotoView {
                 break;
             case MotionEvent.ACTION_UP:
                 if (!mIsMoved) {
-                    //a click event
+                    //a single click event
                     if (mPhotoViewListener != null) {
                         mPhotoViewListener.onTap();
                     }
                 } else {
-                    //dismiss page while the distance of the slide on Y axis moren than 900
-                    if (Math.abs(mMoveY) > 900) {
+                    //dismiss page while the distance of the slide on Y axis more than 1/3 height of screen
+                    if (Math.abs(mMoveY) > getHeight() / 3) {
                         if (mPhotoViewListener != null) {
                             mPhotoViewListener.onDismiss();
+                            mIsDismiss = true;
                         }
                     } else {
                         //reset the position of photo
