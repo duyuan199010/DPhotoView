@@ -1,14 +1,23 @@
 package com.duyuan.photoview;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +41,8 @@ import java.util.List;
  */
 public class PhotoActivity extends AppCompatActivity {
     private static final String EXTRA_PHOTOS = "photos";
+    private static final String[] PERMISSIONS = { Manifest.permission.WRITE_EXTERNAL_STORAGE };
+    private static final int PERMISSION_CODE = 100;
 
     private ViewPager mViewPager;
     private TextView mPageTv;
@@ -67,12 +78,15 @@ public class PhotoActivity extends AppCompatActivity {
         mSaveTv = (TextView) findViewById(R.id.tv_save);
         mSaveTv.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
-                new SavePhotoTask(mPhotos.get(mViewPager.getCurrentItem())).execute();
+                if (checkPermission()) {
+                    new SavePhotoTask(mPhotos.get(mViewPager.getCurrentItem())).execute();
+                }
             }
         });
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override public void onPageScrolled(int position, float positionOffset,
                     int positionOffsetPixels) {
+
                 mPageTv.setText(String.valueOf(position + 1) + "/" + mPhotos.size());
             }
 
@@ -159,6 +173,10 @@ public class PhotoActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Save photo
+     * @param photoUrl
+     */
     private void savePhoto(String photoUrl) {
         OutputStream outputStream = null;
         HttpURLConnection httpURLConnection = null;
@@ -191,6 +209,28 @@ public class PhotoActivity extends AppCompatActivity {
             e.printStackTrace();
         } finally {
             bitmap.recycle();
+        }
+    }
+
+    /**
+     * check permission
+     * @return
+     */
+    public boolean checkPermission() {
+        if (ContextCompat.checkSelfPermission(this, PERMISSIONS[0])
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_CODE);
+        }
+        return true;
+    }
+
+    @Override public void onRequestPermissionsResult(int requestCode, String permissions[],
+            int[] grantResults) {
+        if (requestCode == PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                new SavePhotoTask(mPhotos.get(mViewPager.getCurrentItem())).execute();
+            }
+            return;
         }
     }
 }
