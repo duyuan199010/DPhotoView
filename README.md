@@ -7,7 +7,7 @@ Dependency
 Add this to your module's `build.gradle` file:
 
 ```
-compile 'com.duyuan:DPhotoView:1.0.3'
+compile 'com.duyuan:DPhotoView:1.0.4'
 ```
 Usage
 --

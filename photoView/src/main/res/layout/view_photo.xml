@@ -1,8 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<com.duyuan.photoview.DPhotoView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/photo"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:wheel="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    />
+    >
+  <com.duyuan.photoview.DPhotoView
+      android:id="@+id/iv_photo"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      />
+
+  <com.pnikosis.materialishprogress.ProgressWheel
+      android:id="@+id/progress_wheel"
+      android:layout_width="100dp"
+      android:layout_height="100dp"
+      android:layout_centerInParent="true"
+      wheel:matProg_barColor="@android:color/white"
+      wheel:matProg_progressIndeterminate="true"
+      />
+  <TextView
+      android:id="@+id/tv_progress"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerInParent="true"
+      android:text="0%"
+      android:textColor="@android:color/white"
+      android:textSize="16sp"
+      />
+
+</RelativeLayout>

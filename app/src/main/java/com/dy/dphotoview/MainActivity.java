@@ -15,11 +15,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final ArrayList<String> photos = new ArrayList<>();
-        photos.add("http://www.ymfarms.com/file/upload/201607/15/155720714959.jpg");
+        //photos.add("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1486649968368&di=f951a41839ef31be231fb839d2c7efbf&imgtype=0&src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fwallpaper%2F1306%2F17%2Fc0%2F22190407_1371452382110.jpg");
         photos.add(
-                "http://img5q.duitang.com/uploads/item/201503/22/20150322103113_vAf2s.thumb.700_0.jpeg");
-        photos.add("http://img0.ph.126.net/8DKh0dJgAXtRZTkf_Xizpg==/6630316799257554651.jpg");
-        photos.add("http://img4q.duitang.com/uploads/item/201501/21/20150121114739_GNNj2.jpeg");
+                "http://pic109.nipic.com/file/20160914/4516668_215919019000_2.jpg");
+        photos.add("http://pic108.nipic.com/file/20160901/4516668_210829551000_2.jpg");
+        photos.add("http://pic109.nipic.com/file/20160909/4516668_153420589000_2.jpg");
         findViewById(R.id.photo).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
 

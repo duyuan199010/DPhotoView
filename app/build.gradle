@@ -27,5 +27,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.0.0'
     testCompile 'junit:junit:4.12'
 //    compile project(':photoView')
-    compile 'com.duyuan:DPhotoView:1.0.3'
+    compile 'com.duyuan:DPhotoView:1.0.4'
 }

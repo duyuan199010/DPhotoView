@@ -9,16 +9,18 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.IntRange;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.squareup.picasso.Picasso;
+import com.pnikosis.materialishprogress.ProgressWheel;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -42,7 +44,7 @@ public class PhotoActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private TextView mPageTv;
     private TextView mSaveTv;
-    private List<DPhotoView> mPhotoViews;
+    private List<View> mPhotoViews;
     private List<String> mPhotos;
 
     /**
@@ -100,12 +102,24 @@ public class PhotoActivity extends AppCompatActivity {
         mPhotoViews = new ArrayList<>(mPhotos.size());
 
         for (String photo : mPhotos) {
-            final DPhotoView photoView = (DPhotoView) View.inflate(this, R.layout.view_photo, null);
-            Picasso.with(this)
-                    .load(photo)
-                    .error(R.mipmap.ic_launcher)
-                    .placeholder(R.mipmap.ic_launcher)
-                    .into(photoView);
+            View view = LayoutInflater.from(this).inflate(R.layout.view_photo, null, false);
+            final DPhotoView photoView = (DPhotoView) view.findViewById(R.id.iv_photo);
+            final TextView progressTv = (TextView) view.findViewById(R.id.tv_progress);
+            final ProgressWheel progressWheel =
+                    (ProgressWheel) view.findViewById(R.id.progress_wheel);
+            DPicasso.getPicasso(this, new DPicassoDownloader.ProgressListener() {
+                @Override public void onProgress(@IntRange(from = 0, to = 100) final int percent) {
+                    runOnUiThread(new Runnable() {
+                        @Override public void run() {
+                            progressTv.setText(percent + "%");
+                            if (percent == 100) {
+                                progressTv.setVisibility(View.GONE);
+                                progressWheel.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+                }
+            }).load(photo).into(photoView);
             photoView.setPhotoViewListener(new DPhotoView.IPhotoViewListener() {
                 @Override public void onTap() {
                     if (mPageTv.getVisibility() == View.VISIBLE) {
@@ -124,7 +138,7 @@ public class PhotoActivity extends AppCompatActivity {
                     finish();
                 }
             });
-            mPhotoViews.add(photoView);
+            mPhotoViews.add(view);
         }
 
         PhotoAdapter adapter = new PhotoAdapter();
